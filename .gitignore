@@ -1,0 +1,9 @@
+**/*.env
+**/debug*
+
+.vscode
+
+vendor
+
+release-notes
+stdout
