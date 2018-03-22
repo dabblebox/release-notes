@@ -4,11 +4,12 @@ import (
 	"fmt"
 
 	"github.com/dabblebox/release-notes/components/integration/git"
+	"github.com/dabblebox/release-notes/components/links"
 	"github.com/spf13/viper"
 )
 
 // Build ...
-func Build(repo, tag string) ([]string, error) {
+func Build(repo, tag string, url links.URL) ([]string, error) {
 	tags, err := git.GetTags(repo)
 	if err != nil {
 		return []string{}, err
@@ -26,6 +27,8 @@ func Build(repo, tag string) ([]string, error) {
 
 	notes := []string{}
 	for x := 1; x <= viper.GetInt("max-commits"); x++ {
+
+		commit.Commit.Message = links.Insert(url, commit.Commit.Message)
 
 		notes = append(notes, commit.Commit.Message)
 

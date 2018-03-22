@@ -5,6 +5,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/dabblebox/release-notes/components/links"
 	"github.com/dabblebox/release-notes/components/notes"
 
 	"github.com/dabblebox/release-notes/components/integration/git"
@@ -14,7 +15,7 @@ import (
 
 func TestBuilder(t *testing.T) {
 
-	changes, err := notes.Build("ams-guardian-api", "v0.1.3")
+	changes, err := notes.Build("ams-guardian-api", "v0.1.3", links.URL{})
 	if err != nil {
 		fmt.Println(err)
 	}

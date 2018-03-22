@@ -18,16 +18,25 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dabblebox/release-notes/components/links"
 	"github.com/dabblebox/release-notes/components/notes"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-var tag = ""
-var repo = ""
-var githubURL = ""
-var githubAPIKey = ""
-var maxCommits = 0
+var (
+	gitTag  = ""
+	gitRepo = ""
+
+	githubURL    = ""
+	githubAPIKey = ""
+
+	maxCommits = 0
+
+	urlRegEx = ""
+	urlToken = ""
+	urlLink  = ""
+)
 
 // genCmd represents the gen command
 var genCmd = &cobra.Command{
@@ -35,7 +44,14 @@ var genCmd = &cobra.Command{
 	Short: "Generate release notes from commits.",
 	Long:  `Generate release notes from commits.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		changes, err := notes.Build(viper.GetString("git-repo"), viper.GetString("git-tag"))
+
+		url := links.URL{
+			ReplaceRegEx:  viper.GetString("url-regex"),
+			ReplaceToken:  viper.GetString("url-token"),
+			TokenizedLink: viper.GetString("url-link"),
+		}
+
+		changes, err := notes.Build(viper.GetString("git-repo"), viper.GetString("git-tag"), url)
 		if err != nil {
 			fmt.Print(err)
 			os.Exit(1)
@@ -51,11 +67,11 @@ func init() {
 	RootCmd.AddCommand(genCmd)
 
 	const tagName = "git-tag"
-	genCmd.PersistentFlags().StringVarP(&tag, tagName, "t", "", "release tag")
+	genCmd.PersistentFlags().StringVarP(&gitTag, tagName, "t", "", "release tag")
 	viper.BindPFlag(tagName, genCmd.PersistentFlags().Lookup(tagName))
 
 	const repoName = "git-repo"
-	genCmd.PersistentFlags().StringVarP(&repo, repoName, "r", "", "repo")
+	genCmd.PersistentFlags().StringVarP(&gitRepo, repoName, "r", "", "repo")
 	viper.BindPFlag(repoName, genCmd.PersistentFlags().Lookup(repoName))
 
 	const urlName = "github-url"
@@ -69,4 +85,16 @@ func init() {
 	const maxCommitsName = "max-commits"
 	genCmd.PersistentFlags().IntVarP(&maxCommits, maxCommitsName, "c", 100, "max number of commits to display")
 	viper.BindPFlag(maxCommitsName, genCmd.PersistentFlags().Lookup(maxCommitsName))
+
+	const urlRegexName = "url-regex"
+	genCmd.PersistentFlags().StringVarP(&urlRegEx, urlRegexName, "x", "", "regular expression for replacing token in link")
+	viper.BindPFlag(urlRegexName, genCmd.PersistentFlags().Lookup(urlRegexName))
+
+	const urlTokenName = "url-token"
+	genCmd.PersistentFlags().StringVarP(&urlToken, urlTokenName, "k", "", "token in the link that will be replaced using regex")
+	viper.BindPFlag(urlTokenName, genCmd.PersistentFlags().Lookup(urlTokenName))
+
+	const urlLinkName = "url-link"
+	genCmd.PersistentFlags().StringVarP(&urlLink, urlLinkName, "l", "", "link to use in the commit")
+	viper.BindPFlag(urlLinkName, genCmd.PersistentFlags().Lookup(urlLinkName))
 }
