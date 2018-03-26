@@ -2,14 +2,14 @@ package notes
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/dabblebox/release-notes/components/integration/git"
 	"github.com/dabblebox/release-notes/components/links"
-	"github.com/spf13/viper"
 )
 
 // Build ...
-func Build(repo, tag string, url links.URL) ([]string, error) {
+func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, error) {
 	tags, err := git.GetTags(repo)
 	if err != nil {
 		return []string{}, err
@@ -26,11 +26,13 @@ func Build(repo, tag string, url links.URL) ([]string, error) {
 	}
 
 	notes := []string{}
-	for x := 1; x <= viper.GetInt("max-commits"); x++ {
+	for x := 1; x <= maxCommits; x++ {
 
-		commit.Commit.Message = links.Insert(url, commit.Commit.Message)
+		if isCommitImportant(filter, commit.Commit) {
+			commit.Commit.Message = links.Insert(url, commit.Commit.Message)
 
-		notes = append(notes, commit.Commit.Message)
+			notes = append(notes, commit.Commit.Message)
+		}
 
 		if isCommitTagged(commit.Parents[0].SHA, tags) {
 			break
@@ -43,6 +45,12 @@ func Build(repo, tag string, url links.URL) ([]string, error) {
 	}
 
 	return notes, nil
+}
+
+func isCommitImportant(filter string, commit git.CommitCommit) bool {
+	re := regexp.MustCompile(filter)
+
+	return re.MatchString(commit.Message)
 }
 
 func isCommitTagged(SHA string, tags map[string]git.Tag) bool {

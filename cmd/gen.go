@@ -32,6 +32,7 @@ var (
 	githubAPIKey = ""
 
 	maxCommits = 0
+	filter     = ""
 
 	urlRegEx = ""
 	urlToken = ""
@@ -51,7 +52,12 @@ var genCmd = &cobra.Command{
 			TokenizedLink: viper.GetString("url-link"),
 		}
 
-		changes, err := notes.Build(viper.GetString("git-repo"), viper.GetString("git-tag"), url)
+		changes, err := notes.Build(
+			viper.GetString("git-repo"),
+			viper.GetString("git-tag"),
+			viper.GetString("commit-filter"),
+			viper.GetInt("max-commits"),
+			url)
 		if err != nil {
 			fmt.Print(err)
 			os.Exit(1)
@@ -67,11 +73,11 @@ func init() {
 	RootCmd.AddCommand(genCmd)
 
 	const tagName = "git-tag"
-	genCmd.PersistentFlags().StringVarP(&gitTag, tagName, "t", "", "release tag")
+	genCmd.PersistentFlags().StringVarP(&gitTag, tagName, "t", "", "git release tag")
 	viper.BindPFlag(tagName, genCmd.PersistentFlags().Lookup(tagName))
 
 	const repoName = "git-repo"
-	genCmd.PersistentFlags().StringVarP(&gitRepo, repoName, "r", "", "repo")
+	genCmd.PersistentFlags().StringVarP(&gitRepo, repoName, "r", "", "git repo")
 	viper.BindPFlag(repoName, genCmd.PersistentFlags().Lookup(repoName))
 
 	const urlName = "github-url"
@@ -85,6 +91,10 @@ func init() {
 	const maxCommitsName = "max-commits"
 	genCmd.PersistentFlags().IntVarP(&maxCommits, maxCommitsName, "c", 100, "max number of commits to display")
 	viper.BindPFlag(maxCommitsName, genCmd.PersistentFlags().Lookup(maxCommitsName))
+
+	const commitFilterName = "commit-filter"
+	genCmd.PersistentFlags().StringVarP(&filter, commitFilterName, "f", "", "regex filter that removes commits that do not match")
+	viper.BindPFlag(commitFilterName, genCmd.PersistentFlags().Lookup(commitFilterName))
 
 	const urlRegexName = "url-regex"
 	genCmd.PersistentFlags().StringVarP(&urlRegEx, urlRegexName, "x", "", "regular expression for replacing token in link")
