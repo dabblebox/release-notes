@@ -73,11 +73,11 @@ func init() {
 	RootCmd.AddCommand(genCmd)
 
 	const tagName = "git-tag"
-	genCmd.PersistentFlags().StringVarP(&gitTag, tagName, "t", "", "git release tag")
+	genCmd.PersistentFlags().StringVarP(&gitTag, tagName, "t", "", "git release tag including desired commits")
 	viper.BindPFlag(tagName, genCmd.PersistentFlags().Lookup(tagName))
 
 	const repoName = "git-repo"
-	genCmd.PersistentFlags().StringVarP(&gitRepo, repoName, "r", "", "git repo")
+	genCmd.PersistentFlags().StringVarP(&gitRepo, repoName, "r", "", "git repository including desired commits")
 	viper.BindPFlag(repoName, genCmd.PersistentFlags().Lookup(repoName))
 
 	const urlName = "github-url"
@@ -85,26 +85,26 @@ func init() {
 	viper.BindPFlag(urlName, genCmd.PersistentFlags().Lookup(urlName))
 
 	const authName = "github-auth"
-	genCmd.PersistentFlags().StringVarP(&githubAPIKey, authName, "a", "", "GitHub api authorization token")
+	genCmd.PersistentFlags().StringVarP(&githubAPIKey, authName, "a", "", "GitHub personal access token")
 	viper.BindPFlag(authName, genCmd.PersistentFlags().Lookup(authName))
 
 	const maxCommitsName = "max-commits"
-	genCmd.PersistentFlags().IntVarP(&maxCommits, maxCommitsName, "c", 100, "max number of commits to display")
+	genCmd.PersistentFlags().IntVarP(&maxCommits, maxCommitsName, "c", 25, "number of commits to walk through searching for a previous release tag")
 	viper.BindPFlag(maxCommitsName, genCmd.PersistentFlags().Lookup(maxCommitsName))
 
 	const commitFilterName = "commit-filter"
-	genCmd.PersistentFlags().StringVarP(&filter, commitFilterName, "f", "", "regex filter that removes commits that do not match")
+	genCmd.PersistentFlags().StringVarP(&filter, commitFilterName, "f", "", "regex filter to include specific commits")
 	viper.BindPFlag(commitFilterName, genCmd.PersistentFlags().Lookup(commitFilterName))
 
 	const urlRegexName = "url-regex"
-	genCmd.PersistentFlags().StringVarP(&urlRegEx, urlRegexName, "x", "", "regular expression for replacing token in link")
+	genCmd.PersistentFlags().StringVarP(&urlRegEx, urlRegexName, "x", "", "regex used to search and replace url token in story link")
 	viper.BindPFlag(urlRegexName, genCmd.PersistentFlags().Lookup(urlRegexName))
 
 	const urlTokenName = "url-token"
-	genCmd.PersistentFlags().StringVarP(&urlToken, urlTokenName, "k", "", "token in the link that will be replaced using regex")
+	genCmd.PersistentFlags().StringVarP(&urlToken, urlTokenName, "k", "", "url token in the story link that will be replaced using regex")
 	viper.BindPFlag(urlTokenName, genCmd.PersistentFlags().Lookup(urlTokenName))
 
 	const urlLinkName = "url-link"
-	genCmd.PersistentFlags().StringVarP(&urlLink, urlLinkName, "l", "", "link to use in the commit")
+	genCmd.PersistentFlags().StringVarP(&urlLink, urlLinkName, "l", "", "story link injected into the commit")
 	viper.BindPFlag(urlLinkName, genCmd.PersistentFlags().Lookup(urlLinkName))
 }
