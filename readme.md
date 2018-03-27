@@ -21,9 +21,9 @@ $ env GOOS=linux GOARCH=386 go build
 
 #### Send Release Notes to Slack ####
 
-1. Pleace release notes binary in tools folder within your project.
+1. Add release notes binary to a project in `tools` directory.
 2. Set up Slack [webhook](https://taylorcoding.slack.com/apps/new/A0F7XDUAZ-incoming-webhooks).
-3. Add environment variables.
+3. Add environment variables to build server.
 4. Call command from deploy scripts.
 ```bash 
 $ echo '{"text":"Version '$VERSION_NUM' for '$CIRCLE_PROJECT_REPONAME' has been deployed to dev. '$(./tools/release-notes gen --git-repo $CIRCLE_PROJECT_REPONAME --git-tag $CIRCLE_TAG --github-auth $GIT_HUB_PERSONAL_ACCESS_TOKEN --url-link "<http://tickets.turner.com/browse/{TICKET_NUMBER}|{TICKET_NUMBER}>" --url-regex "[A-Z]{7}-\d*" --commit-filter "[A-Z]{7}-\d*" --url-token "{TICKET_NUMBER}")'"}' | curl -H "Content-Type:application/json" -d @- $SLACK_WEBHOOK_URL
