@@ -32,6 +32,8 @@ func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, e
 			commit.Commit.Message = links.Insert(url, commit.Commit.Message)
 
 			notes = append(notes, commit.Commit.Message)
+		} else {
+			x--
 		}
 
 		if isCommitTagged(commit.Parents[0].SHA, tags) {
