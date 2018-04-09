@@ -9,8 +9,9 @@ import (
 )
 
 // Build ...
-func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, error) {
-	tags, err := git.GetTags(repo)
+func Build(repo, tag, filter, url, accessToken string, maxCommits int, linkConfig links.URL) ([]string, error) {
+
+	tags, err := git.GetTags(repo, url, accessToken)
 	if err != nil {
 		return []string{}, err
 	}
@@ -20,7 +21,7 @@ func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, e
 		return []string{}, fmt.Errorf("tag %s not found", tag)
 	}
 
-	commit, err := git.GetCommit(repo, startTag.Commit.SHA)
+	commit, err := git.GetCommit(repo, startTag.Commit.SHA, url, accessToken)
 	if err != nil {
 		return []string{}, err
 	}
@@ -29,7 +30,7 @@ func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, e
 	for x := 1; x <= maxCommits; x++ {
 
 		if isCommitImportant(filter, commit.Commit) {
-			commit.Commit.Message = links.Insert(url, commit.Commit.Message)
+			commit.Commit.Message = links.Insert(linkConfig, commit.Commit.Message)
 
 			notes = append(notes, commit.Commit.Message)
 		} else {
@@ -40,7 +41,7 @@ func Build(repo, tag, filter string, maxCommits int, url links.URL) ([]string, e
 			break
 		}
 
-		commit, err = git.GetCommit(repo, commit.Parents[0].SHA)
+		commit, err = git.GetCommit(repo, commit.Parents[0].SHA, url, accessToken)
 		if err != nil {
 			return notes, err
 		}

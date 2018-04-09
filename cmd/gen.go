@@ -56,6 +56,8 @@ var genCmd = &cobra.Command{
 			viper.GetString("git-repo"),
 			viper.GetString("git-tag"),
 			viper.GetString("commit-filter"),
+			viper.GetString("github-url"),
+			viper.GetString("github-auth"),
 			viper.GetInt("max-commits"),
 			url)
 		if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"testing"
 
@@ -15,7 +16,11 @@ import (
 
 func TestBuilder(t *testing.T) {
 
-	changes, err := notes.Build("ams-guardian-api", "v0.1.3", links.URL{})
+	changes, err := notes.Build("ams-guardian-api", "v0.2.0-beta", `[A-Z]{7}-\d*`, os.Getenv("GITHUB_URL"), os.Getenv("GITHUB_PERSONAL_ACCESS_TOKEN"), 10, links.URL{
+		ReplaceRegEx:  `[A-Z]{7}-\d*`,
+		TokenizedLink: "<http://tickets.turner.com/browse/{TICKET_NUMBER}|{TICKET_NUMBER}>",
+		ReplaceToken:  "TICKET_NUMBER",
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -27,12 +32,12 @@ func TestBuilder(t *testing.T) {
 
 func TestGitHubGetTags(t *testing.T) {
 
-	tags, err := git.GetTags("ams-guardian-api")
+	tags, err := git.GetTags("ams-guardian-api", os.Getenv("GITHUB_URL"), os.Getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	commit, err := git.GetCommit("ams-guardian-api", tags["v0.2.0"].Commit.SHA)
+	commit, err := git.GetCommit("ams-guardian-api", tags["v0.2.0"].Commit.SHA, os.Getenv("GITHUB_URL"), os.Getenv("GITHUB_PERSONAL_ACCESS_TOKEN"))
 	if err != nil {
 		fmt.Println(err)
 	}

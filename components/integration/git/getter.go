@@ -7,8 +7,6 @@ import (
 	"net/http"
 
 	"encoding/json"
-
-	"github.com/spf13/viper"
 )
 
 // Tag ...
@@ -23,15 +21,15 @@ type TagCommit struct {
 }
 
 // GetTags ...
-func GetTags(repo string) (map[string]Tag, error) {
+func GetTags(repo, url, accessToken string) (map[string]Tag, error) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/repos/turnercode/%s/tags", viper.GetString("github-url"), repo), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/repos/turnercode/%s/tags", url, repo), nil)
 	if err != nil {
 		return map[string]Tag{}, err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("token %s", viper.GetString("github-auth")))
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", accessToken))
 	resp, err := client.Do(req)
 	if err != nil {
 		return map[string]Tag{}, err
@@ -78,17 +76,17 @@ type CommitCommit struct {
 }
 
 // GetCommit ...
-func GetCommit(repo, SHA string) (Commit, error) {
+func GetCommit(repo, SHA, url, accessToken string) (Commit, error) {
 	client := &http.Client{}
 
 	commit := Commit{}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/repos/turnercode/%s/commits/%s", viper.GetString("github-url"), repo, SHA), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/repos/turnercode/%s/commits/%s", url, repo, SHA), nil)
 	if err != nil {
 		return commit, err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("token %s", viper.GetString("github-auth")))
+	req.Header.Add("Authorization", fmt.Sprintf("token %s", accessToken))
 	resp, err := client.Do(req)
 	if err != nil {
 		return commit, err
